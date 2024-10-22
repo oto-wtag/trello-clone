@@ -34,7 +34,12 @@ const NewBoardEntry = ({ boards, setBoards, setIsPopoverOpen }) => {
     visibility: "workspace",
   });
 
-  const [isTitleError, setIsTitleError] = useState(false);
+  const [titleError, setTitleError] = useState("");
+
+  const TITLE_ERRORS = {
+    REQUIRED_FIELD: "👋  Board title is required",
+    TAKEN_TITLE: "👋  Board title already taken",
+  };
 
   const pictures = [cave, dessert, flower, hotAirBalloon, lighthouse, milkyWay];
 
@@ -60,14 +65,14 @@ const NewBoardEntry = ({ boards, setBoards, setIsPopoverOpen }) => {
       boardTitle: e.target.value,
     }));
 
-    setIsTitleError(e.target.value === "");
+    setTitleError(e.target.value === "" ? TITLE_ERRORS.REQUIRED_FIELD : "");
   };
 
   const handleTitleFocus = () => {
     if (!formValues.boardTitle) {
-      setIsTitleError(true);
+      setTitleError(TITLE_ERRORS.REQUIRED_FIELD);
     } else {
-      setIsTitleError(false);
+      setTitleError("");
     }
   };
 
@@ -77,6 +82,17 @@ const NewBoardEntry = ({ boards, setBoards, setIsPopoverOpen }) => {
     let existingBoards = existingBoardsJSON
       ? JSON.parse(existingBoardsJSON)
       : [];
+
+    // Check if the board title is already taken
+    const isTitleTaken = existingBoards.some(
+      (board) => board.boardTitle === newBoard.boardTitle
+    );
+
+    if (isTitleTaken) {
+      // Handle the case where the board title is already taken (e.g., show an error)
+      setTitleError(TITLE_ERRORS.TAKEN_TITLE);
+      return; // Exit the function
+    }
 
     // Add the new board to the existing array
     existingBoards.unshift(newBoard);
@@ -195,19 +211,16 @@ const NewBoardEntry = ({ boards, setBoards, setIsPopoverOpen }) => {
         {/* Board Title Section */}
         <div className="w-full space-y-2">
           <h4 className="text-sm font-bold ">
-            Board title{" "}
-            {isTitleError && <span className="text-red-600">*</span>}
+            Board title {titleError && <span className="text-red-600">*</span>}
           </h4>
           <Input
             placeholder="Title"
             value={formValues.boardTitle}
             onFocus={handleTitleFocus}
             onChange={handleInputChange}
-            className={isTitleError && "!border-red-600 focus:!ring-0"}
+            className={titleError && "!border-red-600 focus:!ring-0"}
           />
-          {isTitleError && (
-            <p className="text-sm">&#128075; Board title is required</p>
-          )}
+          {titleError && <p className="text-sm">{titleError}</p>}
         </div>
 
         {/* Board Visibility Section */}
@@ -241,7 +254,7 @@ const NewBoardEntry = ({ boards, setBoards, setIsPopoverOpen }) => {
           <Button className={cn("w-full")}>Start free trial</Button>
           <Button
             className={cn("w-full")}
-            disabled={!formValues.boardTitle || isTitleError}
+            disabled={!formValues.boardTitle || titleError}
             onClick={handleSubmit}
           >
             Create
