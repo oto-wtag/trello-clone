@@ -91,13 +91,13 @@ const NewBoardEntry = ({ boards, setBoards, setIsPopoverOpen }) => {
     }
 
     // Add the new board to the existing array
-    existingBoards.unshift(newBoard);
+    const updatedBoards = [newBoard, ...boards];
 
     // Update local storage
-    localStorage.setItem("boards", JSON.stringify(existingBoards));
+    localStorage.setItem("boards", JSON.stringify(updatedBoards));
 
     // Update the boards state
-    setBoards(existingBoards);
+    setBoards(updatedBoards);
 
     // Close the popover
     setIsPopoverOpen(false);
