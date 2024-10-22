@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   ChevronLeft,
   Trello,
@@ -20,9 +20,26 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+import NewBoardEntry from "@/components/NewBoardEntry";
 import { Link } from "react-router-dom";
 
-const SideBar = () => {
+const SideBar = ({ setBackground }) => {
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [boards, setBoards] = useState([]);
+
+  useEffect(() => {
+    const existingBoardsJSON = localStorage.getItem("boards");
+    if (existingBoardsJSON) {
+      const existingBoards = JSON.parse(existingBoardsJSON);
+      setBoards(existingBoards);
+    }
+  }, []);
+
+  const handleClearData = () => {
+    localStorage.removeItem("boards");
+    setBoards([]);
+  };
+
   return (
     <aside className="text-white h-[calc(100vh-48px)] w-72 flex flex-col">
       {/* Top Section */}
@@ -85,7 +102,7 @@ const SideBar = () => {
           <div className="flex items-center gap-3 px-4 py-1 h-7 cursor-pointer group">
             <h4 className="text-sm flex-1 font-bold">Your boards</h4>
             <Ellipsis className="h-6 w-6 p-1 rounded-sm transition-all hidden hover:bg-muted group-hover:inline-block" />
-            <Popover>
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger>
                 <Plus className="h-6 w-6 p-1 rounded-sm transition-all hover:bg-muted" />
               </PopoverTrigger>
@@ -93,18 +110,44 @@ const SideBar = () => {
                 align="start"
                 sideOffset={30}
                 className={cn("w-[22rem]")}
-              ></PopoverContent>
+              >
+                <NewBoardEntry
+                  board={boards}
+                  setBoards={setBoards}
+                  setIsPopoverOpen={setIsPopoverOpen}
+                />
+              </PopoverContent>
             </Popover>
           </div>
 
-          {/* list of baords here */}
+          {/* list of baords */}
+          {boards.map((board) => (
+            <Link
+              to={`/b/${board.id}`}
+              key={board.id}
+              className="flex items-center gap-3 px-4 py-1 h-7 cursor-pointer hover:bg-muted-foreground group"
+              onClick={() => setBackground(board.backgroundImage)}
+            >
+              <div
+                className="h-5 w-5 rounded-sm"
+                style={{
+                  background: `${board.backgroundImage} center / cover`,
+                }}
+              ></div>
+              <h4 className="text-sm flex-1">{board.boardTitle}</h4>
+              <Ellipsis className="h-6 w-6 p-1 rounded-sm transition-all hidden hover:bg-muted group-hover:inline-block" />
+              <Star className="h-6 w-6 p-1 rounded-sm transition-all hidden hover:scale-125 group-hover:inline-block" />
+            </Link>
+          ))}
         </div>
       </div>
 
       {/* Footer Div */}
 
       <div className="px-4 py-2">
-        <Button className={cn("w-full")}>Clear Data</Button>
+        <Button className={cn("w-full")} onClick={handleClearData}>
+          Clear Data
+        </Button>
       </div>
     </aside>
   );
