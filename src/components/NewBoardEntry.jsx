@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
@@ -28,6 +29,7 @@ import milkyWay from "@/assets/bg-images/milky-way.jpg";
 import NewBoardEntryColorSelector from "@/components/NewBoardEntryColorSelector";
 
 const NewBoardEntry = ({ boards, setBoards, setIsPopoverOpen }) => {
+  const navigate = useNavigate();
   const [formValues, setFormValues] = useState({
     backgroundImage: "#07b335",
     boardTitle: "",
@@ -101,6 +103,9 @@ const NewBoardEntry = ({ boards, setBoards, setIsPopoverOpen }) => {
 
     // Close the popover
     setIsPopoverOpen(false);
+
+    // Navigate to newly created board
+    navigate(`/b/${newBoard.id}`);
   };
 
   return (

@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 import NewBoardEntry from "@/components/NewBoardEntry";
 import { Link } from "react-router-dom";
 
-const SideBar = ({ setBackground }) => {
+const SideBar = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [boards, setBoards] = useState([]);
 
@@ -126,7 +126,6 @@ const SideBar = ({ setBackground }) => {
               to={`/b/${board.id}`}
               key={board.id}
               className="flex items-center gap-3 px-4 py-1 h-7 cursor-pointer hover:bg-muted-foreground group"
-              onClick={() => setBackground(board.backgroundImage)}
             >
               <div
                 className="h-5 w-5 rounded-sm flex-shrink-0"
