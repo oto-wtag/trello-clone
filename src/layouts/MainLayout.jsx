@@ -5,6 +5,7 @@ import TopBar from "@/components/TopBar";
 import SideBar from "@/components/SideBar";
 
 const MainLayout = () => {
+  // backgrund state initialized for when the user will be able to select their own backgrounds. The initial state is blue
   const [background, setBackground] = useState("#84d5f5");
 
   return (
