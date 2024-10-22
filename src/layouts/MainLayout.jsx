@@ -5,7 +5,7 @@ import TopBar from "@/components/TopBar";
 import SideBar from "@/components/SideBar";
 
 const MainLayout = () => {
-  const [background, setBackground] = useState("");
+  const [background, setBackground] = useState("#84d5f5");
 
   return (
     <div

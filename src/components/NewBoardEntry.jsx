@@ -78,13 +78,9 @@ const NewBoardEntry = ({ boards, setBoards, setIsPopoverOpen }) => {
 
   const handleSubmit = () => {
     const newBoard = { id: Date.now(), ...formValues };
-    const existingBoardsJSON = localStorage.getItem("boards");
-    let existingBoards = existingBoardsJSON
-      ? JSON.parse(existingBoardsJSON)
-      : [];
 
     // Check if the board title is already taken
-    const isTitleTaken = existingBoards.some(
+    const isTitleTaken = boards.some(
       (board) => board.boardTitle === newBoard.boardTitle
     );
 

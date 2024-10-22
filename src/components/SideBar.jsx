@@ -112,7 +112,7 @@ const SideBar = ({ setBackground }) => {
                 className={cn("w-[22rem]")}
               >
                 <NewBoardEntry
-                  board={boards}
+                  boards={boards}
                   setBoards={setBoards}
                   setIsPopoverOpen={setIsPopoverOpen}
                 />
@@ -129,12 +129,12 @@ const SideBar = ({ setBackground }) => {
               onClick={() => setBackground(board.backgroundImage)}
             >
               <div
-                className="h-5 w-5 rounded-sm"
+                className="h-5 w-5 rounded-sm flex-shrink-0"
                 style={{
                   background: `${board.backgroundImage} center / cover`,
                 }}
               ></div>
-              <h4 className="text-sm flex-1">{board.boardTitle}</h4>
+              <h4 className="text-sm flex-1 truncate">{board.boardTitle}</h4>
               <Ellipsis className="h-6 w-6 p-1 rounded-sm transition-all hidden hover:bg-muted group-hover:inline-block" />
               <Star className="h-6 w-6 p-1 rounded-sm transition-all hidden hover:scale-125 group-hover:inline-block" />
             </Link>
