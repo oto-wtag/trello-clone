@@ -48,5 +48,3 @@ const AddNewList = () => {
 };
 
 export default AddNewList;
-
-//palak siam susmoy ashfaq
