@@ -58,8 +58,6 @@ const BoardPage = () => {
 
     const updatedBoard = { ...boardDetails };
 
-    console.log(updatedBoard);
-
     updatedBoard.list = updatedBoard.list.map((list) => {
       if (list.id === listId) {
         return {
@@ -81,6 +79,48 @@ const BoardPage = () => {
     localStorage.setItem("boards", JSON.stringify(updatedBoards));
   };
 
+  const handleDeleteList = (listId) => {
+    const updatedBoard = {
+      ...boardDetails,
+      list: boardDetails.list.filter((list) => list.id !== listId), // Filter out the list to delete
+    };
+
+    setBoardDetails(updatedBoard);
+
+    const storedBoards = JSON.parse(localStorage.getItem("boards") || "[]");
+
+    const updatedBoards = storedBoards.map((board) =>
+      board.id === updatedBoard.id ? updatedBoard : board
+    );
+
+    localStorage.setItem("boards", JSON.stringify(updatedBoards));
+  };
+
+  const handleDeleteListCard = (listId, cardId) => {
+    const updatedBoard = {
+      ...boardDetails,
+      list: boardDetails.list.map((list) => {
+        if (list.id === listId) {
+          return {
+            ...list,
+            listCards: list.listCards.filter((card) => card.id !== cardId),
+          };
+        }
+        return list;
+      }),
+    };
+
+    setBoardDetails(updatedBoard);
+
+    const storedBoards = JSON.parse(localStorage.getItem("boards") || "[]");
+
+    const updatedBoards = storedBoards.map((board) =>
+      board.id === updatedBoard.id ? updatedBoard : board
+    );
+
+    localStorage.setItem("boards", JSON.stringify(updatedBoards));
+  };
+
   return (
     <div>
       <BoardTitle boardDetails={boardDetails} />
@@ -90,6 +130,8 @@ const BoardPage = () => {
             key={index}
             listItem={listItem}
             handleAddCardClick={handleAddCardClick}
+            handleDeleteList={handleDeleteList}
+            handleDeleteListCard={handleDeleteListCard}
           />
         ))}
         <AddNewList handleAddList={handleAddList} />
