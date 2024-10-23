@@ -11,7 +11,6 @@ const ListCard = ({ card, handleCardDelete }) => {
 
   const handleSubmitDeleteCard = () => {
     setIsPopoverOpen(false);
-    //console.log(card.id);
     handleCardDelete(card.id);
   };
 
