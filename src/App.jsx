@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import MainLayout from "@/layouts/MainLayout";
 import Home from "@/pages/Home";
+import BoardPage from "@/pages/BoardPage";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/b/:id" element={<BoardPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
