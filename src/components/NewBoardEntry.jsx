@@ -79,7 +79,7 @@ const NewBoardEntry = ({ boards, setBoards, setIsPopoverOpen }) => {
   };
 
   const handleSubmit = () => {
-    const newBoard = { id: Date.now(), ...formValues };
+    const newBoard = { id: Date.now(), list: [], ...formValues };
 
     // Check if the board title is already taken
     const isTitleTaken = boards.some(
