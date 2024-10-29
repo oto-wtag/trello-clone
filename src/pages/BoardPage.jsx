@@ -9,6 +9,7 @@ const BoardPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [boardDetails, setBoardDetails] = useState(null);
+  const [listDetails, setListDetails] = useState([]);
 
   useEffect(() => {
     const storedBoards = JSON.parse(localStorage.getItem("boards") || "[]");
@@ -17,10 +18,17 @@ const BoardPage = () => {
 
     if (board) {
       setBoardDetails(board);
+      setListDetails(board.list || []);
     } else {
       navigate("/");
     }
-  }, [id]);
+  }, [id, navigate]);
+
+  useEffect(() => {
+    if (boardDetails) {
+      setListDetails(boardDetails.list || []);
+    }
+  }, [boardDetails]);
 
   const handleAddList = (listName) => {
     if (listName && boardDetails) {
@@ -36,47 +44,28 @@ const BoardPage = () => {
       };
 
       setBoardDetails(updatedBoard);
-
-      const storedBoards = JSON.parse(localStorage.getItem("boards") || "[]");
-
-      const updatedBoards = storedBoards.map((board) =>
-        board.id === boardDetails.id ? updatedBoard : board
-      );
-
-      localStorage.setItem("boards", JSON.stringify(updatedBoards));
+      updateLocalStorage(updatedBoard);
     } else {
       alert("Error Creating List");
     }
   };
 
-  const handleAddCardClick = (cardName, listId) => {
-    if (cardName.trim() === "") return;
-    const card = {
-      id: Date.now(),
-      cardName,
+  const handleCardUpdate = (updatedCardList, listId) => {
+    const updatedBoard = {
+      ...boardDetails,
+      list: boardDetails.list.map((list) => {
+        if (list.id === listId) {
+          return {
+            ...list,
+            listCards: updatedCardList,
+          };
+        }
+        return list;
+      }),
     };
 
-    const updatedBoard = { ...boardDetails };
-
-    updatedBoard.list = updatedBoard.list.map((list) => {
-      if (list.id === listId) {
-        return {
-          ...list,
-          listCards: [...list.listCards, card],
-        };
-      }
-      return list;
-    });
-
     setBoardDetails(updatedBoard);
-
-    const storedBoards = JSON.parse(localStorage.getItem("boards") || "[]");
-
-    const updatedBoards = storedBoards.map((board) =>
-      board.id === updatedBoard.id ? updatedBoard : board
-    );
-
-    localStorage.setItem("boards", JSON.stringify(updatedBoards));
+    updateLocalStorage(updatedBoard);
   };
 
   const handleDeleteList = (listId) => {
@@ -86,7 +75,10 @@ const BoardPage = () => {
     };
 
     setBoardDetails(updatedBoard);
+    updateLocalStorage(updatedBoard);
+  };
 
+  const updateLocalStorage = (updatedBoard) => {
     const storedBoards = JSON.parse(localStorage.getItem("boards") || "[]");
 
     const updatedBoards = storedBoards.map((board) =>
@@ -96,44 +88,23 @@ const BoardPage = () => {
     localStorage.setItem("boards", JSON.stringify(updatedBoards));
   };
 
-  const handleDeleteListCard = (listId, cardId) => {
-    const updatedBoard = {
-      ...boardDetails,
-      list: boardDetails.list.map((list) => {
-        if (list.id === listId) {
-          return {
-            ...list,
-            listCards: list.listCards.filter((card) => card.id !== cardId),
-          };
-        }
-        return list;
-      }),
-    };
-
-    setBoardDetails(updatedBoard);
-
-    const storedBoards = JSON.parse(localStorage.getItem("boards") || "[]");
-
-    const updatedBoards = storedBoards.map((board) =>
-      board.id === updatedBoard.id ? updatedBoard : board
-    );
-
-    localStorage.setItem("boards", JSON.stringify(updatedBoards));
-  };
+  if (!boardDetails) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
       <BoardTitle boardDetails={boardDetails} />
       <div className="p-5 flex gap-3 flex-wrap items-start">
-        {boardDetails?.list?.map((listItem, index) => (
-          <BoardListItem
-            key={index}
-            listItem={listItem}
-            handleAddCardClick={handleAddCardClick}
-            handleDeleteList={handleDeleteList}
-            handleDeleteListCard={handleDeleteListCard}
-          />
-        ))}
+        {listDetails &&
+          listDetails.map((listItem) => (
+            <BoardListItem
+              key={listItem.id}
+              listItem={listItem}
+              handleDeleteList={handleDeleteList}
+              handleCardUpdate={handleCardUpdate}
+            />
+          ))}
         <AddNewList handleAddList={handleAddList} />
       </div>
     </div>

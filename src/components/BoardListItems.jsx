@@ -10,21 +10,26 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-const BoardListItem = ({
-  listItem,
-  handleAddCardClick,
-  handleDeleteList,
-  handleDeleteListCard,
-}) => {
+const BoardListItem = ({ listItem, handleDeleteList, handleCardUpdate }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isAddCardClicked, setIsAddCardClicked] = useState(false);
+  const [cardDetails, setCardDetails] = useState(listItem.listCards);
   const [cardName, setCardName] = useState("");
 
   const handleSubmit = () => {
+    if (cardName.trim() === "") return;
     setCardName("");
     setIsAddCardClicked(false);
 
-    handleAddCardClick(cardName, listItem.id);
+    const card = {
+      id: Date.now(),
+      cardName,
+    };
+
+    const updatedCardDetails = [...cardDetails, card];
+    setCardDetails(updatedCardDetails);
+
+    handleCardUpdate(updatedCardDetails, listItem.id);
   };
 
   const handleSubmitDeleteList = () => {
@@ -33,7 +38,9 @@ const BoardListItem = ({
   };
 
   const handleCardDelete = (cardId) => {
-    handleDeleteListCard(listItem.id, cardId);
+    const updatedCardList = cardDetails.filter((card) => card.id !== cardId);
+    setCardDetails(updatedCardList);
+    handleCardUpdate(updatedCardList, listItem.id);
   };
 
   return (
@@ -57,13 +64,14 @@ const BoardListItem = ({
       </div>
 
       <div className="space-y-2">
-        {listItem?.listCards?.map((card, index) => (
-          <ListCard
-            key={index}
-            card={card}
-            handleCardDelete={handleCardDelete}
-          />
-        ))}
+        {cardDetails &&
+          cardDetails.map((card, index) => (
+            <ListCard
+              key={index}
+              card={card}
+              handleCardDelete={handleCardDelete}
+            />
+          ))}
       </div>
 
       {isAddCardClicked ? (
