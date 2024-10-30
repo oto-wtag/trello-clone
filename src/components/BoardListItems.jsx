@@ -9,27 +9,43 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useSortable } from "@dnd-kit/sortable";
+import { useDroppable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 
 const BoardListItem = ({ listItem, handleDeleteList, handleCardUpdate }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isAddCardClicked, setIsAddCardClicked] = useState(false);
-  const [cardDetails, setCardDetails] = useState(listItem.listCards);
   const [cardName, setCardName] = useState("");
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    translate,
+    transition,
+  } = useSortable({ id: listItem.id });
+
+  const { setNodeRef: droppableRef } = useDroppable({
+    id: listItem.id,
+  });
 
   const handleSubmit = () => {
     if (cardName.trim() === "") return;
-    setCardName("");
-    setIsAddCardClicked(false);
 
-    const card = {
-      id: Date.now(),
+    const newCard = {
+      id: `c${Date.now()}`,
       cardName,
     };
 
-    const updatedCardDetails = [...cardDetails, card];
-    setCardDetails(updatedCardDetails);
+    // Update the listItem cards directly and propagate the update to the parent
+    const updatedCardList = [...listItem.listCards, newCard];
+    handleCardUpdate(updatedCardList, listItem.id);
 
-    handleCardUpdate(updatedCardDetails, listItem.id);
+    setCardName("");
+    setIsAddCardClicked(false);
   };
 
   const handleSubmitDeleteList = () => {
@@ -38,18 +54,39 @@ const BoardListItem = ({ listItem, handleDeleteList, handleCardUpdate }) => {
   };
 
   const handleCardDelete = (cardId) => {
-    const updatedCardList = cardDetails.filter((card) => card.id !== cardId);
-    setCardDetails(updatedCardList);
+    const updatedCardList = listItem.listCards.filter(
+      (card) => card.id !== cardId
+    );
     handleCardUpdate(updatedCardList, listItem.id);
   };
 
+  const style = {
+    transition,
+    translate: CSS.Translate.toString(translate),
+    transform: CSS.Translate.toString(transform),
+  };
+
   return (
-    <div className="w-72 rounded-md bg-white dark:bg-black bg-opacity-80 dark:bg-opacity-70 px-2 py-4 space-y-3">
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      style={style}
+      className="w-72 rounded-md bg-white dark:bg-black bg-opacity-80 dark:bg-opacity-70 px-2 py-4 space-y-3"
+    >
       <div className="px-2 flex justify-between items-center">
-        <h1 className="text-sm font-bold">{listItem.listName}</h1>
+        <h1
+          {...listeners}
+          ref={setActivatorNodeRef}
+          className="text-sm font-bold flex-grow"
+        >
+          {listItem.listName}
+        </h1>
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger>
-            <Ellipsis className="h-6 w-6 p-1 rounded-sm transition-all hover:bg-muted" />
+            <Ellipsis
+              className="h-6 w-6 p-1 rounded-sm transition-all hover:bg-muted"
+              onClick={() => console.log("clicked")}
+            />
           </PopoverTrigger>
           <PopoverContent align="start" sideOffset={30}>
             <div
@@ -63,9 +100,9 @@ const BoardListItem = ({ listItem, handleDeleteList, handleCardUpdate }) => {
         </Popover>
       </div>
 
-      <div className="space-y-2">
-        {cardDetails &&
-          cardDetails.map((card, index) => (
+      <div ref={droppableRef} className="space-y-2 min-h-1">
+        {listItem.listCards &&
+          listItem.listCards.map((card, index) => (
             <ListCard
               key={index}
               card={card}

@@ -5,17 +5,40 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 
 const ListCard = ({ card, handleCardDelete }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    translate,
+  } = useDraggable({ id: card.id });
 
   const handleSubmitDeleteCard = () => {
     setIsPopoverOpen(false);
     handleCardDelete(card.id);
   };
 
+  const style = {
+    transition,
+    translate: CSS.Translate.toString(translate),
+    transform: CSS.Translate.toString(transform),
+  };
+
   return (
-    <div className="w-full bg-background rounded-md text-sm font-semibold flex items-start gap-3 hover:cursor-pointer hover:outline hover:outline-2 hover:outline-black dark:hover:outline-white">
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className="w-full bg-background rounded-md text-sm font-semibold flex items-start gap-3 hover:cursor-pointer hover:outline hover:outline-2 hover:outline-black dark:hover:outline-white"
+    >
       <div className="flex-grow p-3">
         <h1>{card.cardName}</h1>
       </div>
