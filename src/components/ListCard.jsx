@@ -5,7 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useDraggable } from "@dnd-kit/core";
+import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 const ListCard = ({ card, handleCardDelete }) => {
@@ -15,10 +15,14 @@ const ListCard = ({ card, handleCardDelete }) => {
     attributes,
     listeners,
     setNodeRef,
+    setActivatorNodeRef,
     transform,
     transition,
     translate,
-  } = useDraggable({ id: card.id });
+  } = useSortable({
+    id: card.id,
+    data: { type: "card" },
+  });
 
   const handleSubmitDeleteCard = () => {
     setIsPopoverOpen(false);
@@ -26,8 +30,8 @@ const ListCard = ({ card, handleCardDelete }) => {
   };
 
   const style = {
-    transition,
-    translate: CSS.Translate.toString(translate),
+    //transition,
+    //translate: CSS.Translate.toString(translate),
     transform: CSS.Translate.toString(transform),
   };
 
@@ -35,11 +39,10 @@ const ListCard = ({ card, handleCardDelete }) => {
     <div
       ref={setNodeRef}
       style={style}
-      {...listeners}
       {...attributes}
       className="w-full bg-background rounded-md text-sm font-semibold flex items-start gap-3 hover:cursor-pointer hover:outline hover:outline-2 hover:outline-black dark:hover:outline-white"
     >
-      <div className="flex-grow p-3">
+      <div ref={setActivatorNodeRef} {...listeners} className="flex-grow p-3">
         <h1>{card.cardName}</h1>
       </div>
 

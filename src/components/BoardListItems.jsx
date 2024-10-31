@@ -9,8 +9,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useSortable } from "@dnd-kit/sortable";
-import { useDroppable } from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 const BoardListItem = ({ listItem, handleDeleteList, handleCardUpdate }) => {
@@ -26,17 +29,16 @@ const BoardListItem = ({ listItem, handleDeleteList, handleCardUpdate }) => {
     transform,
     translate,
     transition,
-  } = useSortable({ id: listItem.id });
-
-  const { setNodeRef: droppableRef } = useDroppable({
+  } = useSortable({
     id: listItem.id,
+    data: { type: "list" },
   });
 
   const handleSubmit = () => {
     if (cardName.trim() === "") return;
 
     const newCard = {
-      id: `c${Date.now()}`,
+      id: Date.now(),
       cardName,
     };
 
@@ -61,8 +63,8 @@ const BoardListItem = ({ listItem, handleDeleteList, handleCardUpdate }) => {
   };
 
   const style = {
-    transition,
-    translate: CSS.Translate.toString(translate),
+    //transition,
+    //translate: CSS.Translate.toString(translate),
     transform: CSS.Translate.toString(transform),
   };
 
@@ -71,7 +73,7 @@ const BoardListItem = ({ listItem, handleDeleteList, handleCardUpdate }) => {
       ref={setNodeRef}
       {...attributes}
       style={style}
-      className="w-72 rounded-md bg-white dark:bg-black bg-opacity-80 dark:bg-opacity-70 px-2 py-4 space-y-3"
+      className="w-72 overflow-auto rounded-md bg-white dark:bg-black bg-opacity-80 dark:bg-opacity-70 px-2 py-4 space-y-3"
     >
       <div className="px-2 flex justify-between items-center">
         <h1
@@ -83,10 +85,7 @@ const BoardListItem = ({ listItem, handleDeleteList, handleCardUpdate }) => {
         </h1>
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger>
-            <Ellipsis
-              className="h-6 w-6 p-1 rounded-sm transition-all hover:bg-muted"
-              onClick={() => console.log("clicked")}
-            />
+            <Ellipsis className="h-6 w-6 p-1 rounded-sm transition-all hover:bg-muted" />
           </PopoverTrigger>
           <PopoverContent align="start" sideOffset={30}>
             <div
@@ -100,7 +99,10 @@ const BoardListItem = ({ listItem, handleDeleteList, handleCardUpdate }) => {
         </Popover>
       </div>
 
-      <div ref={droppableRef} className="space-y-2 min-h-1">
+      <SortableContext
+        items={listItem.listCards.map((i) => i.id)}
+        strategy={verticalListSortingStrategy}
+      >
         {listItem.listCards &&
           listItem.listCards.map((card, index) => (
             <ListCard
@@ -109,7 +111,7 @@ const BoardListItem = ({ listItem, handleDeleteList, handleCardUpdate }) => {
               handleCardDelete={handleCardDelete}
             />
           ))}
-      </div>
+      </SortableContext>
 
       {isAddCardClicked ? (
         <div className="bg-background px-2 py-3 rounded-md space-y-3">
