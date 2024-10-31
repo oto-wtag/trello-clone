@@ -21,9 +21,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import NewBoardEntry from "@/components/NewBoardEntry";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SideBar = () => {
+  const navigate = useNavigate();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [boards, setBoards] = useState([]);
 
@@ -38,6 +39,7 @@ const SideBar = () => {
   const handleClearData = () => {
     localStorage.removeItem("boards");
     setBoards([]);
+    navigate("/");
   };
 
   return (
